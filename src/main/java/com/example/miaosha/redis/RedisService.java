@@ -77,6 +77,7 @@ public class RedisService {
             jedis = jedisPool.getResource();
             //生成真正的key
             String realKey = prefix.getPrefix() + key;
+            //该操作是原子操作
             return jedis.incr(realKey);
         } finally {
             returnToPool(jedis);
@@ -90,6 +91,7 @@ public class RedisService {
             jedis = jedisPool.getResource();
             //生成真正的key
             String realKey = prefix.getPrefix() + key;
+            //该操作是原子操作
             return jedis.decr(realKey);
         } finally {
             returnToPool(jedis);
