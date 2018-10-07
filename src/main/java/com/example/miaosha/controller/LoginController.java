@@ -1,22 +1,20 @@
 package com.example.miaosha.controller;
 
-import com.example.miaosha.domain.User;
 import com.example.miaosha.redis.RedisService;
-import com.example.miaosha.redis.UserKey;
 import com.example.miaosha.result.CodeMsg;
 import com.example.miaosha.result.Result;
 import com.example.miaosha.service.MiaoshaUserService;
-import com.example.miaosha.service.UserService;
 import com.example.miaosha.util.ValidatorUtil;
 import com.example.miaosha.vo.LoginVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.thymeleaf.util.StringUtils;
+
+import javax.validation.Valid;
 
 /**
  * @Auther: 庞洋洋
@@ -45,10 +43,12 @@ public class LoginController {
 
     @RequestMapping("/do_login")
     @ResponseBody
-    public Result<Boolean> doLogin(LoginVo loginVo){
+    public Result<Boolean> doLogin(@Valid LoginVo loginVo){
         logger.info(loginVo.toString());
-        //参数校验
-        String inputPass = loginVo.getPassword();
+
+
+        //参数校验  不需要了 因为有了jsr参数校验
+        /*String inputPass = loginVo.getPassword();
         String mobile = loginVo.getMobile();
         if (StringUtils.isEmpty(inputPass)){
             return Result.error(CodeMsg.PASSWORD_EMPTY);
@@ -58,7 +58,9 @@ public class LoginController {
         }
         if(!ValidatorUtil.isMobile(mobile)){
             return Result.error(CodeMsg.MOBILE_ERROR);
-        }
+        }*/
+
+
         //登录
         CodeMsg codeMsg = miaoshaUserService.login(loginVo);
         if(codeMsg.getCode() == 0){
