@@ -13,6 +13,7 @@ public class CodeMsg {
     //通用异常 （好处是只需要一个地方维护就可以了  很方便）
     public static CodeMsg SUCCESS = new CodeMsg(0, "success");
     public static CodeMsg SERVER_ERROE = new CodeMsg(500100, "服务端异常");
+    public static CodeMsg BIND_ERROE = new CodeMsg(500101, "参数校验异常：%s");  //带了一个参数
 
     //登录模块
     public static CodeMsg SESSION_ERROR = new CodeMsg(500210, "Session不存在或者已经失效");
@@ -28,6 +29,12 @@ public class CodeMsg {
     private CodeMsg(int code, String msg) {
         this.code = code;
         this.msg = msg;
+    }
+
+    public CodeMsg fillArgs(Object...args){
+        int code = this.code;
+        String message = String.format(this.msg, args);
+        return new CodeMsg(code, message);
     }
 
     public int getCode() {

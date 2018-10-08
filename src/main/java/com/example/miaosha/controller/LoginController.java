@@ -61,13 +61,17 @@ public class LoginController {
         }*/
 
 
-        //登录
-        CodeMsg codeMsg = miaoshaUserService.login(loginVo);
+        //登录 增加了 全局异常处理，所以下面的就不需要了
+        /*CodeMsg codeMsg = miaoshaUserService.login(loginVo);
         if(codeMsg.getCode() == 0){
             return Result.success(true);
         }else {
             return Result.error(codeMsg);
-        }
+        }*/
+
+        miaoshaUserService.login(loginVo);
+        return Result.success(true);
+
     }
 
 
