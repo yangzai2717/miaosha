@@ -31,11 +31,13 @@ public class MiaoshaUserService {
          return miaoshaUserDao.getById(id);
      }
 
-     public MiaoshaUser getByToken(String token){
+     public MiaoshaUser getByToken(String token, HttpServletResponse response){
          if (StringUtils.isEmpty(token)){
              return  null;
          }
-         return redisService.get(MiaoshaUserKey.token, token, MiaoshaUser.class);
+         MiaoshaUser user = redisService.get(MiaoshaUserKey.token, token, MiaoshaUser.class);
+         addCookie(user, response, token);  //通过重新写入的方式来，修改cookie中的过期时间
+         return user;
      }
 
     public boolean login(HttpServletResponse response, LoginVo loginVo) {
@@ -58,6 +60,11 @@ public class MiaoshaUserService {
         }
         //登录成功后要生成 cookie
         String token = UUIDUtil.uuid();
+        addCookie(user, response, token);
+        return true;
+    }
+
+    private void addCookie(MiaoshaUser user, HttpServletResponse response, String token){
         //我们需要标识下 该token属于哪个用户 ，所以需要把对应关系 保存到redis中
         redisService.set(MiaoshaUserKey.token,token, user);
         //生成cookie
@@ -65,6 +72,5 @@ public class MiaoshaUserService {
         cookie.setMaxAge(MiaoshaUserKey.token.expireSeconds());
         cookie.setPath("/"); //需要将cookie保存到根目录，如果不设置，当跳转的时候不会携带cookie
         response.addCookie(cookie);
-        return true;
     }
 }

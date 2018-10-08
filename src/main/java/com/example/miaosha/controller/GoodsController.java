@@ -38,10 +38,17 @@ public class GoodsController {
     RedisService redisService;
 
 
+    @RequestMapping("/to_list")
+    public String list(Model model, HttpServletResponse response, MiaoshaUser miaoshaUser){
+        //因为配置了 webconfig 重写的ArgumentResolver() 方法 所以不需要再一直获取token 参数 和校验了
+        model.addAttribute("user", miaoshaUser);
+        return "goods_list";
+    }
+
     //controller中的方法分为两大类
     //1. rest api json输出 2.页面
-    @RequestMapping("/to_list")
-    public String toLogin(Model model,
+    /*@RequestMapping("/to_list")
+    public String list(Model model, HttpServletResponse response,
                           @CookieValue(value = MiaoshaUserService.COOKIE_NAME_TOKEN, required = false) String cookieToken,
                           @RequestParam(value = MiaoshaUserService.COOKIE_NAME_TOKEN, required = false) String paramToken){
         //有些时候，手机端会把token放到参数里，并不会放到cookie中，所以兼容这种情况，再从参数中获取一边，只需要设置优先级就可以了，参数中的优先级 高于 cookie中
@@ -50,10 +57,11 @@ public class GoodsController {
             return "login";  //重新登录
         }
         String token = StringUtils.isEmpty(paramToken) ? cookieToken : paramToken;
-        MiaoshaUser miaoshaUser = miaoshaUserService.getByToken(token);
+        MiaoshaUser miaoshaUser = miaoshaUserService.getByToken(token, response);
         model.addAttribute("user", miaoshaUser);
         return "goods_list";
-    }
+    }*/
+
 
 
 

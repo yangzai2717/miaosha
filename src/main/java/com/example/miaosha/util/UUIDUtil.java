@@ -12,4 +12,10 @@ public class UUIDUtil {
     public static String uuid(){
         return UUID.randomUUID().toString().replace("-",""); //原生的uuid是代有-  这个符号的，我们想把他去掉
     }
+
+    public static void main(String[] args) {
+        System.out.println(UUIDUtil.uuid());
+        System.out.println(UUIDUtil.uuid());
+        System.out.println(UUIDUtil.uuid());
+    }
 }
