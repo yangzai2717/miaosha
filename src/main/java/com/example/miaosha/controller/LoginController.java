@@ -48,6 +48,9 @@ public class LoginController {
         logger.info(loginVo.toString());
 
 
+        miaoshaUserService.login(response, loginVo);
+        return Result.success(true);
+
         //参数校验  不需要了 因为有了jsr参数校验
         /*String inputPass = loginVo.getPassword();
         String mobile = loginVo.getMobile();
@@ -70,8 +73,7 @@ public class LoginController {
             return Result.error(codeMsg);
         }*/
 
-        miaoshaUserService.login(response, loginVo);
-        return Result.success(true);
+
 
     }
 
