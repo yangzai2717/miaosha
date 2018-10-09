@@ -4,7 +4,9 @@ import com.example.miaosha.domain.MiaoshaUser;
 import com.example.miaosha.redis.MiaoshaUserKey;
 import com.example.miaosha.redis.RedisService;
 import com.example.miaosha.result.Result;
+import com.example.miaosha.service.GoodsService;
 import com.example.miaosha.service.MiaoshaUserService;
+import com.example.miaosha.vo.GoodsVo;
 import com.example.miaosha.vo.LoginVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import org.thymeleaf.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @Auther: 庞洋洋
@@ -37,11 +40,16 @@ public class GoodsController {
     @Autowired
     RedisService redisService;
 
+    @Autowired
+    GoodsService goodsService;
+
 
     @RequestMapping("/to_list")
-    public String list(Model model, HttpServletResponse response, MiaoshaUser miaoshaUser){
+    public String list(Model model, HttpServletResponse response){
         //因为配置了 webconfig 重写的ArgumentResolver() 方法 所以不需要再一直获取token 参数 和校验了
-        model.addAttribute("user", miaoshaUser);
+        //查询商品列表
+        List<GoodsVo> goodsList = goodsService.listGetGoodsVo();
+        model.addAttribute("goodsList", goodsList);
         return "goods_list";
     }
 
