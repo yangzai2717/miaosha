@@ -13,10 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
@@ -45,13 +42,43 @@ public class GoodsController {
 
 
     @RequestMapping("/to_list")
-    public String list(Model model, HttpServletResponse response){
+    public String list(Model model, MiaoshaUser user){
         //因为配置了 webconfig 重写的ArgumentResolver() 方法 所以不需要再一直获取token 参数 和校验了
         //查询商品列表
+        model.addAttribute("user", user);
         List<GoodsVo> goodsList = goodsService.listGetGoodsVo();
         model.addAttribute("goodsList", goodsList);
         return "goods_list";
     }
+    @RequestMapping("/to_detail/{goodsId}")
+    public String detail(Model model, MiaoshaUser user,
+                         @PathVariable("goodsId") Long goodsId){
+        model.addAttribute("user", user);
+        GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
+
+        //秒杀什么时候开始
+        long startAt = goods.getStartDate().getTime();
+        long endAt = goods.getEndDate().getTime();
+        long now = System.currentTimeMillis();
+
+        int miaoshaStatus = 0;  //秒杀状态
+        int remainSeconds = 0;  //秒杀还剩多少秒
+        if(now < startAt){ //秒杀没有开始 倒计时
+            miaoshaStatus = 0;
+            remainSeconds = (int)((startAt - now)/1000);
+        } else if(now > endAt) { //秒杀已经结束
+            miaoshaStatus = 2;
+            remainSeconds = -1;
+        } else{  //秒杀正在进行中
+            miaoshaStatus = 1;
+            remainSeconds = 0;
+        }
+        model.addAttribute("goods", goods);
+        model.addAttribute("miaoshaStatus", miaoshaStatus);
+        model.addAttribute("remainSeconds", remainSeconds);
+        return "goods_detail";
+    }
+
 
     //controller中的方法分为两大类
     //1. rest api json输出 2.页面

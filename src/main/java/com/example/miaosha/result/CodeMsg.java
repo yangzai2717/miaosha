@@ -15,7 +15,7 @@ public class CodeMsg {
     public static CodeMsg SERVER_ERROE = new CodeMsg(500100, "服务端异常");
     public static CodeMsg BIND_ERROE = new CodeMsg(500101, "参数校验异常：%s");  //带了一个参数
 
-    //登录模块
+    //登录模块 500200
     public static CodeMsg SESSION_ERROR = new CodeMsg(500210, "Session不存在或者已经失效");
     public static CodeMsg PASSWORD_EMPTY = new CodeMsg(500211, "密码不能为空");
     public static CodeMsg MOBILE_EMPTY = new CodeMsg(500212, "手机号不能为空");
@@ -24,7 +24,9 @@ public class CodeMsg {
     public static CodeMsg PASSWORD_ERROR = new CodeMsg(500215, "密码错误");
 
 
-    //登陆模块
+    //秒杀模块 500500
+    public static CodeMsg MIAO_SHA_OVER = new CodeMsg(500500, "商品已经秒杀完毕");
+    public static CodeMsg REPEATE_MIAOSHA = new CodeMsg(500501, "不能重复秒杀");
 
     private CodeMsg(int code, String msg) {
         this.code = code;
