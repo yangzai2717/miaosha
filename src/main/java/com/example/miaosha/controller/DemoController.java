@@ -1,5 +1,6 @@
 package com.example.miaosha.controller;
 
+import com.example.miaosha.domain.MiaoshaUser;
 import com.example.miaosha.domain.User;
 import com.example.miaosha.redis.RedisService;
 import com.example.miaosha.redis.UserKey;
@@ -85,5 +86,12 @@ public class DemoController {
         user.setName("1111111");
         redisService.set(UserKey.getById, ""+1, user);
         return Result.success(true);
+    }
+
+    @RequestMapping("/info")
+    @ResponseBody
+    public Result<MiaoshaUser> info(Model model, MiaoshaUser user){
+        model.addAttribute("user", user);
+        return Result.success(user);
     }
 }
