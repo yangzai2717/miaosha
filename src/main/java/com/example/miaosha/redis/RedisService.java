@@ -99,6 +99,20 @@ public class RedisService {
         }
     }
 
+    public <T> Boolean del(KeyPrefix prefix, String key){
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            //生成真正的key
+            String realKey = prefix.getPrefix() + key;
+            long ret = jedis.del(realKey);
+            return ret > 0;
+        } finally {
+            returnToPool(jedis);
+            //因为是一个连接池，所以要关闭连接，要不就会导致连接不够用了
+        }
+    }
+
     private <T> String beanToString(T value) {
         if (value == null){
             return null;

@@ -27,14 +27,49 @@ public class MiaoshaUserService {
     @Autowired
     RedisService redisService;
 
+    /**
+     * 对象级缓存  查询很简单 但是增量操作的时候  也需要同步跟新redis 里面的数据
+     * @param id
+     * @return
+     */
      public MiaoshaUser getById(Long id){
-         return miaoshaUserDao.getById(id);
+         //取缓存
+         MiaoshaUser user = redisService.get(MiaoshaUserKey.getById, ""+id, MiaoshaUser.class);
+         if(user != null){
+             return user;
+         }
+
+         user = miaoshaUserDao.getById(id);
+         if (user != null){
+             redisService.set(MiaoshaUserKey.getById, ""+id, MiaoshaUser.class);
+         }
+         return user;
+     }
+
+     //对象级缓存 再增量操作的时候 是需要同步更新 redis 的
+     public boolean updatePassword(String token, long id, String newPassword){
+         //取user对象
+         MiaoshaUser user = getById(id);
+         if (user == null){
+             throw  new GlobalException(CodeMsg.MOBILE_NOT_EXIST);
+         }
+         //更新数据库
+         MiaoshaUser toBeUpdate = new MiaoshaUser();
+         toBeUpdate.setId(id);
+         toBeUpdate.setPassword(MD5Util.formPassToDBPass(newPassword, user.getSalt()));
+         miaoshaUserDao.update(toBeUpdate);
+         //处理缓存
+         redisService.del(MiaoshaUserKey.getById, ""+id);
+         user.setPassword(toBeUpdate.getPassword());
+         redisService.set(MiaoshaUserKey.token, token, user);
+         return true;
      }
 
      public MiaoshaUser getByToken(String token, HttpServletResponse response){
          if (StringUtils.isEmpty(token)){
              return  null;
          }
+         //根据token获取对象  这里就是对象级缓存
          MiaoshaUser user = redisService.get(MiaoshaUserKey.token, token, MiaoshaUser.class);
          addCookie(user, response, token);  //通过重新写入的方式来，修改cookie中的过期时间
          return user;
