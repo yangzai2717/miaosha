@@ -3,6 +3,7 @@ package com.example.miaosha.redis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -27,6 +28,15 @@ public class RedisPoolFactory {
         JedisPool jp = new JedisPool(poolConfig, redisConfig.getHost(), redisConfig.getPort(),
                 redisConfig.getTimeout() * 1000, redisConfig.getPassword(), 0);
         return jp;
+    }
+
+    //测试
+    public static void main(String[] args) {
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        JedisPool jp = new JedisPool(poolConfig,"192.168.46.201", 6379,
+                2 * 1000, "123456", 0);
+        Jedis jedis = jp.getResource();
+        System.out.println(jedis.get("GoodsKey:gl"));
     }
 
 }
