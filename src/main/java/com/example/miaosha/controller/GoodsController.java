@@ -64,14 +64,16 @@ public class GoodsController {
     @ResponseBody
     public String list(HttpServletRequest request, HttpServletResponse response, Model model, MiaoshaUser user){
 
-        model.addAttribute("user", user);
-        List<GoodsVo> goodsList = goodsService.listGetGoodsVo();
-        model.addAttribute("goodsList", goodsList);
         //取缓存
         String html = redisService.get(GoodsKey.getGoodsList, "", String.class);
         if(!StringUtils.isEmpty(html)){
             return html;
         }
+
+        model.addAttribute("user", user);
+        List<GoodsVo> goodsList = goodsService.listGetGoodsVo();
+        model.addAttribute("goodsList", goodsList);
+
         //手动渲染 SpringWebContext 过时，可以用WebContext
         WebContext ctx = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
         html = thymeleafViewResolver.getTemplateEngine().process("goods_list", ctx);
