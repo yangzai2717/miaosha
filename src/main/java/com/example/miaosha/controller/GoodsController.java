@@ -7,6 +7,7 @@ import com.example.miaosha.redis.RedisService;
 import com.example.miaosha.result.Result;
 import com.example.miaosha.service.GoodsService;
 import com.example.miaosha.service.MiaoshaUserService;
+import com.example.miaosha.vo.GoodsDetailVo;
 import com.example.miaosha.vo.GoodsVo;
 import com.example.miaosha.vo.LoginVo;
 import org.slf4j.Logger;
@@ -113,9 +114,9 @@ public class GoodsController {
         return "goods_detail";
     }*/
 
-    @RequestMapping(value = "/to_detail/{goodsId}", produces = "text/html; Charset=UTF-8")
+    @RequestMapping(value = "/to_detail1/{goodsId}", produces = "text/html; Charset=UTF-8")
     @ResponseBody
-    public String detail(HttpServletRequest request, HttpServletResponse response, Model model, MiaoshaUser user,
+    public String detail1(HttpServletRequest request, HttpServletResponse response, Model model, MiaoshaUser user,
                          @PathVariable("goodsId") Long goodsId){
         model.addAttribute("user", user);
 
@@ -159,6 +160,37 @@ public class GoodsController {
         return html;
     }
 
+    @RequestMapping(value = "/detail/{goodsId}", produces = "text/html; Charset=UTF-8")
+    @ResponseBody
+    public Result<GoodsDetailVo> detail(HttpServletRequest request, HttpServletResponse response, Model model, MiaoshaUser user,
+                                        @PathVariable("goodsId") Long goodsId){
+        GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
+
+        //秒杀什么时候开始
+        long startAt = goods.getStartDate().getTime();
+        long endAt = goods.getEndDate().getTime();
+        long now = System.currentTimeMillis();
+
+        int miaoshaStatus = 0;  //秒杀状态
+        int remainSeconds = 0;  //秒杀还剩多少秒
+        if(now < startAt){ //秒杀没有开始 倒计时
+            miaoshaStatus = 0;
+            remainSeconds = (int)((startAt - now)/1000);
+        } else if(now > endAt) { //秒杀已经结束
+            miaoshaStatus = 2;
+            remainSeconds = -1;
+        } else{  //秒杀正在进行中
+            miaoshaStatus = 1;
+            remainSeconds = 0;
+        }
+        GoodsDetailVo vo = new GoodsDetailVo();
+        vo.setUser(user);
+        vo.setGoods(goods);
+        vo.setMiaoshaStatus(miaoshaStatus);
+        vo.setRemainSeconds(remainSeconds);
+
+        return Result.success(vo);
+    }
 
     //controller中的方法分为两大类
     //1. rest api json输出 2.页面
