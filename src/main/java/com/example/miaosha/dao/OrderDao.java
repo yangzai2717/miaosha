@@ -4,10 +4,7 @@ package com.example.miaosha.dao;
 import com.example.miaosha.domain.MiaoshaGoods;
 import com.example.miaosha.domain.MiaoshaOrder;
 import com.example.miaosha.domain.OrderInfo;
-import com.example.miaosha.vo.GoodsVo;
 import org.apache.ibatis.annotations.*;
-
-import java.util.List;
 
 @Mapper
 public interface OrderDao {

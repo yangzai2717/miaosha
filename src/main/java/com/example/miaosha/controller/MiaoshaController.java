@@ -1,6 +1,7 @@
 package com.example.miaosha.controller;
 
 import com.example.miaosha.domain.MiaoshaGoods;
+import com.example.miaosha.domain.MiaoshaOrder;
 import com.example.miaosha.domain.MiaoshaUser;
 import com.example.miaosha.domain.OrderInfo;
 import com.example.miaosha.redis.RedisService;
@@ -97,8 +98,8 @@ public class MiaoshaController {
             return Result.error(CodeMsg.MIAO_SHA_OVER);
         }
         //判断是否已经秒杀到了
-        MiaoshaGoods miaoshaGoods = orderService.getMiaoshaOrderByUserIdGoodsId(user.getId(), goodsId);
-        if(miaoshaGoods != null){
+        MiaoshaOrder miaoshaOrder = orderService.getMiaoshaOrderByUserIdGoodsId(user.getId(), goodsId);
+        if(miaoshaOrder != null){
             return Result.error(CodeMsg.REPEATE_MIAOSHA);
         }
         //减库存 下订单 写入秒杀订单 （三步必须保证原子性，及成功都成功，失败都失败，所以需要添加事物）
