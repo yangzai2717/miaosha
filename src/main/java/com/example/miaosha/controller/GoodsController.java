@@ -160,7 +160,7 @@ public class GoodsController {
         return html;
     }
 
-    @RequestMapping(value = "/detail/{goodsId}", produces = "text/html; Charset=UTF-8")
+    @RequestMapping(value = "/detail/{goodsId}")
     @ResponseBody
     public Result<GoodsDetailVo> detail(HttpServletRequest request, HttpServletResponse response, Model model, MiaoshaUser user,
                                         @PathVariable("goodsId") Long goodsId){
