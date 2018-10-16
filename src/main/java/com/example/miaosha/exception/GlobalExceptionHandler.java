@@ -24,16 +24,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public Result<String> exceptionHandler(HttpServletRequest request, Exception e){
         if(e instanceof GlobalException){
+            e.printStackTrace();
             GlobalException ex = (GlobalException) e;
             return Result.error(ex.getCm());
         }
         if(e instanceof BindException){
+            e.printStackTrace();
             BindException ex = (BindException) e;
             List<ObjectError> errors = ex.getAllErrors();
             ObjectError error = errors.get(0);
             String message = error.getDefaultMessage();
             return Result.error(CodeMsg.BIND_ERROE.fillArgs(message));
         }else{
+            e.printStackTrace();
             return Result.error(CodeMsg.SERVER_ERROE);
         }
     }

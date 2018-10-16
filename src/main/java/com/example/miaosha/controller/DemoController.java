@@ -34,13 +34,16 @@ public class DemoController {
     @Autowired
     MQSender mqSender;
 
-    @Autowired
-    MQReceiver mqReceiver;
-
     @RequestMapping("/mq")
     @ResponseBody
     Result<String> mq(){
         mqSender.send("hello pyy");
+        return Result.success("hello world");
+    }
+    @RequestMapping("/mq/topic")
+    @ResponseBody
+    Result<String> topic(){
+        mqSender.sendTopic("hello pyy");
         return Result.success("hello world");
     }
 
