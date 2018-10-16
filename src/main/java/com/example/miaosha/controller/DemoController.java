@@ -2,6 +2,8 @@ package com.example.miaosha.controller;
 
 import com.example.miaosha.domain.MiaoshaUser;
 import com.example.miaosha.domain.User;
+import com.example.miaosha.rabbitmq.MQReceiver;
+import com.example.miaosha.rabbitmq.MQSender;
 import com.example.miaosha.redis.RedisService;
 import com.example.miaosha.redis.UserKey;
 import com.example.miaosha.result.CodeMsg;
@@ -29,10 +31,17 @@ public class DemoController {
     @Autowired
     RedisService redisService;
 
-    @RequestMapping("/")
+    @Autowired
+    MQSender mqSender;
+
+    @Autowired
+    MQReceiver mqReceiver;
+
+    @RequestMapping("/mq")
     @ResponseBody
-    String home(){
-        return "hello world";
+    Result<String> mq(){
+        mqSender.send("hello pyy");
+        return Result.success("hello world");
     }
 
     //controller中的方法分为两大类
