@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
  * @Date: 2018/10/16 17:52
  * @Description:
  */
-@Configuration
+
 public class MQConfig {
 
     public static final String QUEUE = "queue";
@@ -26,7 +26,6 @@ public class MQConfig {
      * Direct模式
      * @param
      */
-    @Bean
     public Queue queue(){
         return new Queue(QUEUE, true); //queue名称，是否持久化
     }
@@ -35,23 +34,18 @@ public class MQConfig {
      * Topic模式  exchange交换机
      * @param
      */
-    @Bean
     public Queue topicQueue1(){
         return new Queue(TOPIC_QUEUE1, true); //queue名称，是否持久化
     }
-    @Bean
     public Queue topicQueue2(){
         return new Queue(TOPIC_QUEUE2, true); //queue名称，是否持久化
     }
-    @Bean
     public TopicExchange topicExchange(){
         return new TopicExchange(TOPIC_EXCHANGE);
     }
-    @Bean
     public Binding topicBinding1(){
         return BindingBuilder.bind(topicQueue1()).to(topicExchange()).with("topic.key1");
     }
-    @Bean
     public Binding topicBinding2(){
         return BindingBuilder.bind(topicQueue2()).to(topicExchange()).with("topic.#");
     }
