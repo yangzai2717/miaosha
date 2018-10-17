@@ -2,14 +2,12 @@ package com.example.miaosha.controller;
 
 import com.example.miaosha.domain.MiaoshaUser;
 import com.example.miaosha.domain.User;
-import com.example.miaosha.rabbitmq.MQReceiver;
 import com.example.miaosha.rabbitmq.MQSender;
 import com.example.miaosha.redis.RedisService;
 import com.example.miaosha.redis.UserKey;
 import com.example.miaosha.result.CodeMsg;
 import com.example.miaosha.result.Result;
 import com.example.miaosha.service.UserService;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,7 +32,7 @@ public class DemoController {
     @Autowired
     MQSender mqSender;
 
-    @RequestMapping("/mq")
+    /*@RequestMapping("/mq")
     @ResponseBody
     Result<String> mq(){
         mqSender.send("hello pyy");
@@ -46,6 +44,13 @@ public class DemoController {
         mqSender.sendTopic("hello pyy");
         return Result.success("hello world");
     }
+
+    @RequestMapping("/mq/fanout")
+    @ResponseBody
+    Result<String> fanout(){
+        mqSender.sendFanout("hello pyy");
+        return Result.success("hello world");
+    }*/
 
     //controller中的方法分为两大类
     //1. rest api json输出 2.页面

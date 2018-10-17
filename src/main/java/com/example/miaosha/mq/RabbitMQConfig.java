@@ -19,7 +19,7 @@ public class RabbitMQConfig {
     @Bean
     public ConnectionFactory connectionFactory(){
         CachingConnectionFactory connectionFactory  = new CachingConnectionFactory();
-        connectionFactory.setAddresses("192.168.46.201:5672");
+        connectionFactory.setAddresses("192.168.239.201:5672");
         connectionFactory.setUsername("guest");
         connectionFactory.setPassword("guest");
         connectionFactory.setVirtualHost("/");
