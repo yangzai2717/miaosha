@@ -4,8 +4,7 @@ import com.example.miaosha.domain.MiaoshaGoods;
 import com.example.miaosha.domain.MiaoshaOrder;
 import com.example.miaosha.domain.MiaoshaUser;
 import com.example.miaosha.domain.OrderInfo;
-import com.example.miaosha.rabbitmq.MQSender;
-import com.example.miaosha.rabbitmq.MiaoshaMessage;
+
 import com.example.miaosha.redis.GoodsKey;
 import com.example.miaosha.redis.RedisService;
 import com.example.miaosha.result.CodeMsg;
@@ -51,8 +50,6 @@ public class MiaoshaController implements InitializingBean{
     @Autowired
     MiaoshaService miaoshaService;
 
-    @Autowired
-    MQSender mqSender;
 
     /*@RequestMapping("/do_miaosha")  //秒杀操作没有做  静态化处理之前的方法
     public String list(Model model, MiaoshaUser user,
@@ -110,10 +107,10 @@ public class MiaoshaController implements InitializingBean{
             return Result.error(CodeMsg.REPEATE_MIAOSHA);
         }
         //入队
-        MiaoshaMessage message = new MiaoshaMessage();
+        /*MiaoshaMessage message = new MiaoshaMessage();
         message.setGoodsId(goodsId);
         message.setUser(user);
-        mqSender.sendMiaoshaMessage(message);
+        mqSender.sendMiaoshaMessage(message);*/
         return Result.success(0); //排队中
 
         //判断商品还有没有库存

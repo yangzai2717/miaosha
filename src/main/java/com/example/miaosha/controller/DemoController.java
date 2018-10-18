@@ -2,7 +2,6 @@ package com.example.miaosha.controller;
 
 import com.example.miaosha.domain.MiaoshaUser;
 import com.example.miaosha.domain.User;
-import com.example.miaosha.rabbitmq.MQSender;
 import com.example.miaosha.redis.RedisService;
 import com.example.miaosha.redis.UserKey;
 import com.example.miaosha.result.CodeMsg;
@@ -29,8 +28,6 @@ public class DemoController {
     @Autowired
     RedisService redisService;
 
-    @Autowired
-    MQSender mqSender;
 
     /*@RequestMapping("/mq")
     @ResponseBody
