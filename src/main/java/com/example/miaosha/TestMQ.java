@@ -220,4 +220,12 @@ public class TestMQ {
         rabbitSender.send("hello pyy ", properties);
     }
 
+    @Test
+    public void testSender2() throws Exception{
+        Order order = new Order();
+        order.setId("001");
+        order.setName("order");
+        rabbitSender.sendOrder(order);
+    }
+
 }
