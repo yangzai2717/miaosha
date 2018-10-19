@@ -24,7 +24,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Auther: 庞洋洋
@@ -54,6 +56,8 @@ public class MiaoshaController implements InitializingBean{
 
     @Autowired
     RabbitSender rabbitSender;
+
+    private Map<Long, Boolean> localOverMap = new HashMap<Long, Boolean>();
 
 
     /*@RequestMapping("/do_miaosha")  //秒杀操作没有做  静态化处理之前的方法
@@ -101,9 +105,16 @@ public class MiaoshaController implements InitializingBean{
             return Result.error(CodeMsg.SESSION_ERROR);
         }
 
+        //内存标记 减少对radis访问
+        boolean over = localOverMap.get(goodsId);
+        if(over){
+            return Result.error(CodeMsg.MIAO_SHA_OVER);
+        }
+
         //预减库存
         long stock = redisService.decr(GoodsKey.getMiaoshaGoodsStock, ""+goodsId);
         if(stock < 0){
+            localOverMap.put(goodsId, true);
             return Result.error(CodeMsg.MIAO_SHA_OVER);
         }
 
@@ -160,6 +171,7 @@ public class MiaoshaController implements InitializingBean{
         }
         for (GoodsVo goods: goodsVos){
             redisService.set(GoodsKey.getMiaoshaGoodsStock, ""+goods.getId(), goods.getStockCount());
+            localOverMap.put(goods.getId(), false);
         }
     }
 }
