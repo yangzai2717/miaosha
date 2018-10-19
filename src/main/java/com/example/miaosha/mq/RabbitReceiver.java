@@ -1,8 +1,17 @@
 package com.example.miaosha.mq;
 
+import com.example.miaosha.domain.MiaoshaOrder;
+import com.example.miaosha.domain.MiaoshaUser;
+import com.example.miaosha.service.GoodsService;
+import com.example.miaosha.service.MiaoshaService;
+import com.example.miaosha.service.OrderService;
+import com.example.miaosha.vo.GoodsVo;
 import com.rabbitmq.client.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.*;
 import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -18,6 +27,16 @@ import java.util.Map;
 @Component
 public class RabbitReceiver {
 
+    public static final Logger logger = LoggerFactory.getLogger(RabbitReceiver.class);
+
+    @Autowired
+    GoodsService goodsService;
+
+    @Autowired
+    OrderService orderService;
+
+    @Autowired
+    MiaoshaService miaoshaService;
 
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(value = "queue-1",
@@ -56,5 +75,43 @@ public class RabbitReceiver {
         channel.basicAck(deliveryTay, false);
     }
 
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = "queue-miaosha",
+                    durable = "true"),
+            exchange = @Exchange(value = "exchange-miaosha",
+                    durable = "true",
+                    type = "topic",
+                    ignoreDeclarationExceptions = "true"),
+            key = "miaosha.*"
+    ))
+    @RabbitHandler
+    public void onMiaoshaMessage(@Payload com.example.miaosha.rabbitmq.MiaoshaMessage miaoshaMessage, Channel channel,
+                                 @Headers Map<String, Object> headers) throws Exception{
+        logger.info("消费端：秒杀message " + miaoshaMessage.toString());
+
+
+        //业务代码
+        MiaoshaUser user = miaoshaMessage.getUser();
+        long goodsId = miaoshaMessage.getGoodsId();
+
+        GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
+        int stock = goods.getStockCount();
+        if(stock <= 0) {
+            return;
+        }
+        //判断是否已经秒杀到了
+        MiaoshaOrder order = orderService.getMiaoshaOrderByUserIdGoodsId(user.getId(), goodsId);
+        if(order != null) {
+            return;
+        }
+        //减库存 下订单 写入秒杀订单
+        miaoshaService.miaosha(user, goods);
+
+        logger.info("-------消费端 消费完毕 完成减 库存----- ");
+
+        Long deliveryTay = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
+        //false 不批量 手动ack
+        channel.basicAck(deliveryTay, false);
+    }
 
 }

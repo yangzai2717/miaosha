@@ -5,6 +5,8 @@ import com.example.miaosha.domain.MiaoshaOrder;
 import com.example.miaosha.domain.MiaoshaUser;
 import com.example.miaosha.domain.OrderInfo;
 
+import com.example.miaosha.mq.RabbitSender;
+import com.example.miaosha.rabbitmq.MiaoshaMessage;
 import com.example.miaosha.redis.GoodsKey;
 import com.example.miaosha.redis.RedisService;
 import com.example.miaosha.result.CodeMsg;
@@ -50,6 +52,9 @@ public class MiaoshaController implements InitializingBean{
     @Autowired
     MiaoshaService miaoshaService;
 
+    @Autowired
+    RabbitSender rabbitSender;
+
 
     /*@RequestMapping("/do_miaosha")  //秒杀操作没有做  静态化处理之前的方法
     public String list(Model model, MiaoshaUser user,
@@ -90,7 +95,7 @@ public class MiaoshaController implements InitializingBean{
     @RequestMapping(value = "/do_miaosha", method = RequestMethod.POST)
     @ResponseBody
     public Result<Integer> list(Model model, MiaoshaUser user,
-                                  @RequestParam("goodsId") long goodsId){
+                                  @RequestParam("goodsId") long goodsId) throws Exception {
         model.addAttribute("user", user);
         if(user == null){
             return Result.error(CodeMsg.SESSION_ERROR);
@@ -98,7 +103,7 @@ public class MiaoshaController implements InitializingBean{
 
         //预减库存
         long stock = redisService.decr(GoodsKey.getMiaoshaGoodsStock, ""+goodsId);
-        if(stock <= 0){
+        if(stock < 0){
             return Result.error(CodeMsg.MIAO_SHA_OVER);
         }
 
@@ -107,10 +112,10 @@ public class MiaoshaController implements InitializingBean{
             return Result.error(CodeMsg.REPEATE_MIAOSHA);
         }
         //入队
-        /*MiaoshaMessage message = new MiaoshaMessage();
+        MiaoshaMessage message = new MiaoshaMessage();
         message.setGoodsId(goodsId);
         message.setUser(user);
-        mqSender.sendMiaoshaMessage(message);*/
+        rabbitSender.sendMessage(message);
         return Result.success(0); //排队中
 
         //判断商品还有没有库存
@@ -130,6 +135,18 @@ public class MiaoshaController implements InitializingBean{
         return Result.success(orderInfo);*/
     }
 
+
+    @RequestMapping(value = "/result", method = RequestMethod.GET)
+    @ResponseBody
+    public Result<Long> miaoshaResult(Model model, MiaoshaUser user,
+                                @RequestParam("goodsId") long goodsId) throws Exception {
+        model.addAttribute("user", user);
+        if(user == null){
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+        Long result = miaoshaService.getMiaoshaResult(user.getId(), goodsId);
+        return Result.success(result);
+    }
 
     /**
      * 系统初始化

@@ -3,6 +3,7 @@ package com.example.miaosha.mq;
 import java.util.Map;
 
 import com.example.miaosha.mq.entity.Order;
+import com.example.miaosha.rabbitmq.MiaoshaMessage;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate.ConfirmCallback;
 import org.springframework.amqp.rabbit.core.RabbitTemplate.ReturnCallback;
@@ -63,6 +64,14 @@ public class RabbitSender {
         CorrelationData cd = new CorrelationData("0987654321");
         //cd.setId(UUID.randomUUID().toString() + String.valueOf(new Date().toString())); //确保全局唯一
         rabbitTemplate.convertAndSend("exchange-2", "springboot.abcdef", order, cd);
+    }
+
+    public void sendMessage(MiaoshaMessage miaoshaMessage) throws Exception{
+        rabbitTemplate.setConfirmCallback(confirmCallback); //消息的确认
+        rabbitTemplate.setReturnCallback(returnCallback);  //消息的返回
+        CorrelationData cd = new CorrelationData("100");
+        //cd.setId(UUID.randomUUID().toString() + String.valueOf(new Date().toString())); //确保全局唯一
+        rabbitTemplate.convertAndSend("exchange-miaosha", "miaosha.1", miaoshaMessage, cd);
     }
 
 
