@@ -27,6 +27,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -187,14 +191,50 @@ public class MiaoshaController implements InitializingBean{
     @RequestMapping(value = "/path", method = RequestMethod.GET)
     @ResponseBody
     public Result<String> path(Model model, MiaoshaUser user,
-                                @RequestParam("goodsId") long goodsId) throws Exception {
+                                @RequestParam("goodsId") long goodsId,
+                                @RequestParam("verifyCode") int verifyCode ) throws Exception {
         model.addAttribute("user", user);
         if (user == null) {
             return Result.error(CodeMsg.SESSION_ERROR);
+        }
+        boolean check = miaoshaService.checkVerifyCode(user, goodsId, verifyCode);
+        if(!check){
+            return Result.error(CodeMsg.REQUEST_ILLEGAL);
         }
 
         String path = miaoshaService.createMiaoshaPath(user, goodsId);
         return Result.success(path);
     }
+
+    /**
+     * 生成验证码
+     * @param
+     * @param user
+     * @param goodsId
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/verifyCode", method = RequestMethod.GET)
+    @ResponseBody
+    public Result<String> getMiaoshaVerifyCode(HttpServletResponse response, MiaoshaUser user,
+                                               @RequestParam("goodsId") long goodsId) throws Exception {
+        if (user == null) {
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+        try {
+            BufferedImage image = miaoshaService.createMiaoshaVerifyCode(user, goodsId);
+            OutputStream outputStream = response.getOutputStream();
+            ImageIO.write(image, "JPEG", outputStream);
+            outputStream.flush();
+            outputStream.close();
+            return null;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+
 
 }
