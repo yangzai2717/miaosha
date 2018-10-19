@@ -8,6 +8,7 @@ import com.example.miaosha.domain.OrderInfo;
 import com.example.miaosha.mq.RabbitSender;
 import com.example.miaosha.rabbitmq.MiaoshaMessage;
 import com.example.miaosha.redis.GoodsKey;
+import com.example.miaosha.redis.MiaoshaKey;
 import com.example.miaosha.redis.RedisService;
 import com.example.miaosha.result.CodeMsg;
 import com.example.miaosha.result.Result;
@@ -15,6 +16,8 @@ import com.example.miaosha.service.GoodsService;
 import com.example.miaosha.service.MiaoshaService;
 import com.example.miaosha.service.MiaoshaUserService;
 import com.example.miaosha.service.OrderService;
+import com.example.miaosha.util.MD5Util;
+import com.example.miaosha.util.UUIDUtil;
 import com.example.miaosha.vo.GoodsVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,13 +99,19 @@ public class MiaoshaController implements InitializingBean{
      * @param goodsId
      * @return
      */
-    @RequestMapping(value = "/do_miaosha", method = RequestMethod.POST)
+    @RequestMapping(value = "/{path}/do_miaosha", method = RequestMethod.POST)
     @ResponseBody
     public Result<Integer> list(Model model, MiaoshaUser user,
-                                  @RequestParam("goodsId") long goodsId) throws Exception {
+                                  @RequestParam("goodsId") long goodsId,
+                                @PathVariable("path") String path) throws Exception {
         model.addAttribute("user", user);
         if(user == null){
             return Result.error(CodeMsg.SESSION_ERROR);
+        }
+        //验证path
+        boolean check  = miaoshaService.checkPath(user, goodsId, path);
+        if(!check){
+            return Result.error(CodeMsg.REQUEST_ILLEGAL);
         }
 
         //内存标记 减少对radis访问
@@ -174,4 +183,18 @@ public class MiaoshaController implements InitializingBean{
             localOverMap.put(goods.getId(), false);
         }
     }
+
+    @RequestMapping(value = "/path", method = RequestMethod.GET)
+    @ResponseBody
+    public Result<String> path(Model model, MiaoshaUser user,
+                                @RequestParam("goodsId") long goodsId) throws Exception {
+        model.addAttribute("user", user);
+        if (user == null) {
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+
+        String path = miaoshaService.createMiaoshaPath(user, goodsId);
+        return Result.success(path);
+    }
+
 }

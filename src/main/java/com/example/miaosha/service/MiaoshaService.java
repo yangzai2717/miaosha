@@ -5,10 +5,13 @@ import com.example.miaosha.domain.MiaoshaUser;
 import com.example.miaosha.domain.OrderInfo;
 import com.example.miaosha.redis.MiaoshaKey;
 import com.example.miaosha.redis.RedisService;
+import com.example.miaosha.util.MD5Util;
+import com.example.miaosha.util.UUIDUtil;
 import com.example.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.util.StringUtils;
 
 
 /**
@@ -64,5 +67,20 @@ public class MiaoshaService {
 
     private boolean getGoodsOver(long goodsId) {
         return redisService.exists(MiaoshaKey.isGoodsOver, ""+goodsId);
+    }
+
+    public boolean checkPath(MiaoshaUser user, long goodsId, String path) {
+        if (user == null || StringUtils.isEmpty(path)){
+            return false;
+        }
+        String pathOld = redisService.get(MiaoshaKey.getMiaoshaPath, ""+user.getId()+"_"+goodsId, String.class);
+        return path.equals(pathOld);
+    }
+
+
+    public String createMiaoshaPath(MiaoshaUser user, long goodsId) {
+        String str = MD5Util.md5(UUIDUtil.uuid()+"12345");
+        redisService.set(MiaoshaKey.getMiaoshaPath, ""+user.getId()+"_"+goodsId, str);
+        return str;
     }
 }
