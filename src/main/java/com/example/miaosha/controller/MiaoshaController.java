@@ -124,6 +124,11 @@ public class MiaoshaController implements InitializingBean{
             return Result.error(CodeMsg.MIAO_SHA_OVER);
         }
 
+        MiaoshaOrder miaoshaOrder = orderService.getMiaoshaOrderByUserIdGoodsId(user.getId(), goodsId);
+        if(miaoshaOrder != null){
+            return Result.error(CodeMsg.REPEATE_MIAOSHA);
+        }
+
         //预减库存
         long stock = redisService.decr(GoodsKey.getMiaoshaGoodsStock, ""+goodsId);
         if(stock < 0){
@@ -131,10 +136,7 @@ public class MiaoshaController implements InitializingBean{
             return Result.error(CodeMsg.MIAO_SHA_OVER);
         }
 
-        MiaoshaOrder miaoshaOrder = orderService.getMiaoshaOrderByUserIdGoodsId(user.getId(), goodsId);
-        if(miaoshaOrder != null){
-            return Result.error(CodeMsg.REPEATE_MIAOSHA);
-        }
+
         //入队
         MiaoshaMessage message = new MiaoshaMessage();
         message.setGoodsId(goodsId);
