@@ -7,6 +7,7 @@ import com.example.miaosha.domain.OrderInfo;
 
 import com.example.miaosha.mq.RabbitSender;
 import com.example.miaosha.rabbitmq.MiaoshaMessage;
+import com.example.miaosha.redis.AccessKey;
 import com.example.miaosha.redis.GoodsKey;
 import com.example.miaosha.redis.MiaoshaKey;
 import com.example.miaosha.redis.RedisService;
@@ -28,6 +29,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
@@ -192,13 +194,25 @@ public class MiaoshaController implements InitializingBean{
 
     @RequestMapping(value = "/path", method = RequestMethod.GET)
     @ResponseBody
-    public Result<String> path(Model model, MiaoshaUser user,
-                                @RequestParam("goodsId") long goodsId,
-                                @RequestParam("verifyCode") int verifyCode ) throws Exception {
-        model.addAttribute("user", user);
+    public Result<String> path(HttpServletRequest request, MiaoshaUser user,
+                               @RequestParam("goodsId") long goodsId,
+                               @RequestParam( "verifyCode") int verifyCode ) throws Exception {
         if (user == null) {
             return Result.error(CodeMsg.SESSION_ERROR);
         }
+
+        //查询访问次数
+        String url = request.getRequestURI();
+        String key = url + "_" + user.getId();
+        Integer count = redisService.get(AccessKey.access, key, Integer.class);
+        if(count == null){
+            redisService.set(AccessKey.access, key, 1);
+        } else if(count < 5){
+            redisService.incr(AccessKey.access, key);
+        } else {
+            return Result.error(CodeMsg.ACCESS_LIMIT_REQUEST);
+        }
+
         boolean check = miaoshaService.checkVerifyCode(user, goodsId, verifyCode);
         if(!check){
             return Result.error(CodeMsg.REQUEST_ILLEGAL);

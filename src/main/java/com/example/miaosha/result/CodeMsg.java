@@ -15,6 +15,7 @@ public class CodeMsg {
     public static CodeMsg SERVER_ERROE = new CodeMsg(500100, "服务端异常");
     public static CodeMsg BIND_ERROE = new CodeMsg(500101, "参数校验异常：%s");  //带了一个参数
     public static CodeMsg REQUEST_ILLEGAL = new CodeMsg(500102, "请求非法");
+    public static CodeMsg ACCESS_LIMIT_REQUEST = new CodeMsg(500103, "访问太频繁了");
 
     //登录模块 500200
     public static CodeMsg SESSION_ERROR = new CodeMsg(500210, "Session不存在或者已经失效");
