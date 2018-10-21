@@ -1,9 +1,11 @@
 package com.example.miaosha.config;
 
 
+import com.example.miaosha.access.AccessInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
@@ -21,6 +23,9 @@ public class WebConfig extends WebMvcConfigurationSupport{
     @Autowired
     UserArgumentResolver userArgumentResolver;
 
+    @Autowired
+    AccessInterceptor accessInterceptor;
+
     /**
      * 这个方法有什么用呢，我们controller的请求方法中的 model requst response 等参数，那么这些参数是怎么来的，谁赋的值，就是这个方法
      * @param argumentResolvers
@@ -34,5 +39,10 @@ public class WebConfig extends WebMvcConfigurationSupport{
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/");
+    }
+
+    @Override
+    protected void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(accessInterceptor);
     }
 }

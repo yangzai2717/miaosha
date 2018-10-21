@@ -1,5 +1,6 @@
 package com.example.miaosha.config;
 
+import com.example.miaosha.access.UserContext;
 import com.example.miaosha.domain.MiaoshaUser;
 import com.example.miaosha.service.MiaoshaUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,27 +42,8 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
         HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class); //取出 request 和 response
         HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
 
-        //从reques中取出 参数
-        String paramToken = request.getParameter(MiaoshaUserService.COOKIE_NAME_TOKEN);
-        String cookieToken = getCookieValue(request, MiaoshaUserService.COOKIE_NAME_TOKEN);
-        if(StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)){
-            return null;
-        }
-        String token = StringUtils.isEmpty(paramToken) ? cookieToken : paramToken;
-        return miaoshaUserService.getByToken(token, response);
+        return UserContext.getUser();
     }
 
-    //遍历cookie中所有的指，取出我们所需要的 及 token
-    private String getCookieValue(HttpServletRequest request, String cookieName){
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null || cookies.length <=0 ){
-            return null;
-        }
-        for (Cookie cookie : cookies){
-            if (cookie.getName().equals(cookieName)){
-                return cookie.getValue();
-            }
-        }
-        return  null;
-    }
+
 }
