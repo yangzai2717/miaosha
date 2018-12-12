@@ -12,7 +12,7 @@ public class Parent {
     }
 
     public Parent() {
-        testParent();
         System.out.println("这是父类构造");
+        testParent();
     }
 }
