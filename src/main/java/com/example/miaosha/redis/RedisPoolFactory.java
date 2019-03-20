@@ -33,10 +33,10 @@ public class RedisPoolFactory {
     //测试
     public static void main(String[] args) {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
-        JedisPool jp = new JedisPool(poolConfig,"192.168.46.201", 6379,
-                2 * 1000, "123456", 0);
+        JedisPool jp = new JedisPool(poolConfig,"localhost", 6379,
+                2 * 1000, null, 0);
         Jedis jedis = jp.getResource();
-        System.out.println(jedis.get("GoodsKey:gl"));
+        System.out.println(jedis.get("name"));
     }
 
 }

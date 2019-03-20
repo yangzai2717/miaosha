@@ -49,8 +49,6 @@ public class CountTest {
             System.out.println( map.toString()+ "\n" + "空格次数 " + spaceCount + " 点次数 " + dianCount);
             String count = map.toString()+ "\n" + "空格次数 " + spaceCount + " 点次数 " + dianCount;
             File outFile = new File("d://outFile.txt");
-            /*OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(outFile));
-            outputStreamWriter.write(count);*/
             BufferedWriter bw = new BufferedWriter(new FileWriter(outFile));
             bw.write(count);
             br.close();
